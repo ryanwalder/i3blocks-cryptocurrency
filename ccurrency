@@ -28,5 +28,5 @@ if [[ ! -z $addresses ]]; then
     echo "$out_total $out_rate $out_fiat"
 else
     out_rate=$(echo $rate | awk '{printf "%\047.2f", $1}')
-    echo "$rate"
+    echo "$out_rate"
 fi

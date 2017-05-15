@@ -1,32 +1,24 @@
 #!/usr/bin/env bash
-# pip install moneywagon
+# Requires python-moneywagon
+#   pip install moneywagon
+
 # usage:
-#  ./ccurrency coin fiat [address1 address2 addressN]
+#  ./ccurrency fiat
 
 
-coin=$1
-fiat=$2
+fiat=$1
 addresses="${@:3}"
 
-rate=$(moneywagon current-price $coin $fiat)
+declare -A coins
+coins=(
+    ["btc"]=""
+    ["ltc"]="Ł"
+    ["eth"]="Ξ"
+)
 
-if [[ ! -z $addresses ]]; then
-    total_coins=0
-    for address in $addresses; do
-        balance=$(moneywagon address-balance $coin --address $address)
-        total_coins=$(echo $total $balance)
-    done
-    # if we have over 1000 coins we probably don't care about 8 decimal places
-    # so format to 2 places
-    if [[ $(echo $total_coins | awk '{printf "%.0f", $1}') -gt 1000 ]]; then
-        out_total=$(echo $total_coins | awk '{printf "%\047.2f", $1}')
-    else
-        out_total=$(echo $total_coins | awk '{printf "%\047.8f", $1}')
-    fi
-    out_rate=$(echo $rate | awk '{printf "%\047.2f", $1}')
-    out_fiat=$(echo $rate $total_coins | awk '{printf "%\047.2f", $1 * $2}')
-    echo "$out_total $out_rate $out_fiat"
-else
-    out_rate=$(echo $rate | awk '{printf "%\047.2f", $1}')
-    echo "$out_rate"
-fi
+for i in "${!coins[@]}"; do
+    price=$(moneywagon current-price $i $fiat)
+    printf "${coins[$i]} $(echo $price | awk '{printf "%\047.2f", $1}') "
+done
+
+printf "\n"

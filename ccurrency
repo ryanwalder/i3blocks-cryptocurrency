@@ -7,7 +7,7 @@
 
 
 fiat=$1
-addresses="${@:3}"
+check="${@:2}"
 
 declare -A coins
 coins=(
@@ -16,8 +16,8 @@ coins=(
     ["eth"]="Ξ"
 )
 
-for i in "${!coins[@]}"; do
-    price=$(moneywagon current-price $i $fiat)
+for i in ${check}; do
+    price=$(moneywagon current-price ${i} $fiat)
     printf "${coins[$i]} $(echo $price | awk '{printf "%\047.2f", $1}') "
 done
 

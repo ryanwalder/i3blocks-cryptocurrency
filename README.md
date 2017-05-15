@@ -8,9 +8,9 @@ i3block to check crypto currency exchange rates for BTC, LTC, ETH in your curren
 
 ## Usage
 
-`./ccurency fiat`
+`./ccurency fiat coin [coin2..coinN]`
 
 eg:
 
-`./ccurency usd`
+`./ccurency usd btc ltc`
 

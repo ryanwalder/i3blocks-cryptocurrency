@@ -1,57 +1,34 @@
-#!/usr/bin/env bash
-# Requires python-moneywagon
-#   pip install moneywagon
+#!/usr/bin/env python3
 
-# usage:
-#  ./ccurrency fiat coin
+import requests
+import json
+import sys
 
-fiat="${1}"
-coin="${2}"
+coin = sys.argv[1].upper()
+fiat = sys.argv[2].upper()
 
-if [[ -z $coin ]]; then
-    coin="btc"
-fi
+lookup = {
+    "GBP": "£",
+    "EUR": "€",
+    "USD": "$",
+    "BTC": "",
+    "LTC": "Ł",
+    "ETH": "Ξ",
+}
 
-if [[ -z $fiat ]]; then
-    fiat="usd"
-fi
+url = 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms={}&tsyms={}'.format(coin, fiat)
 
-declare -A coin_lookup
-coin_lookup=(
-    ["btc"]=""
-    ["ltc"]="Ł"
-    ["eth"]="Ξ"
-)
+r = requests.get(url)
+j = r.json()
 
-declare -A fiat_lookup
-fiat_lookup=(
-    ["gbp"]="£"
-    ["usd"]="$"
-    ["eur"]="€"
-)
+price = j['RAW'][coin][fiat]['PRICE']
+change = round(j['RAW'][coin][fiat]['CHANGE24HOUR'], 2)
+change_pct = round(j['RAW'][coin][fiat]['CHANGEPCT24HOUR'], 2)
 
-last_file="$(pwd)/.last_${fiat}_${coin}"
+if change > 0:
+    change = '{}{}'.format(lookup[fiat], change)
+else:
+    change = str(change)
+    change = '-{}{}'.format(lookup[fiat], change[1:])
 
-if [[ -f "${last_file}" ]]; then
-    last=$(< "${last_file}")
-else
-    unset last
-fi
-
-rm -f "${last_file}"
-
-old=$(echo "$last" | grep $coin | awk '{print $2}')
-price=$(moneywagon current-price $coin $fiat)
-printf "${coin_lookup[$coin]} ${fiat_lookup[$fiat]}$(echo $price | awk '{printf "%\047.2f", $1}')"
-if [[ ! -z $last ]]; then
-    if (( $(echo "$price > $old" | bc -l) )); then
-        printf "↑"
-    elif (( $(echo "$price < $old" | bc -l) )); then
-        printf "↓"
-    else
-        printf "≡"
-    fi
-fi
-echo "$coin $price" >> ${last_file}
-
-printf "\n"
+print('{} {}{} {} {}%'.format(lookup[coin], lookup[fiat], round(price, 2), change, change_pct))

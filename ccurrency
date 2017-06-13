@@ -3,22 +3,55 @@
 #   pip install moneywagon
 
 # usage:
-#  ./ccurrency fiat
+#  ./ccurrency fiat coin
 
+fiat="${1}"
+coin="${2}"
 
-fiat=$1
-check="${@:2}"
+if [[ -z $coin ]]; then
+    coin="btc"
+fi
 
-declare -A coins
-coins=(
+if [[ -z $fiat ]]; then
+    fiat="usd"
+fi
+
+declare -A coin_lookup
+coin_lookup=(
     ["btc"]=""
     ["ltc"]="Ł"
     ["eth"]="Ξ"
 )
 
-for i in ${check}; do
-    price=$(moneywagon current-price ${i} $fiat)
-    printf "${coins[$i]} $(echo $price | awk '{printf "%\047.2f", $1}') "
-done
+declare -A fiat_lookup
+fiat_lookup=(
+    ["gbp"]="£"
+    ["usd"]="$"
+    ["eur"]="€"
+)
+
+last_file="$(pwd)/.last_${fiat}_${coin}"
+
+if [[ -f "${last_file}" ]]; then
+    last=$(< "${last_file}")
+else
+    unset last
+fi
+
+rm -f "${last_file}"
+
+old=$(echo "$last" | grep $coin | awk '{print $2}')
+price=$(moneywagon current-price $coin $fiat)
+printf "${coin_lookup[$coin]} ${fiat_lookup[$fiat]}$(echo $price | awk '{printf "%\047.2f", $1}')"
+if [[ ! -z $last ]]; then
+    if (( $(echo "$price > $old" | bc -l) )); then
+        printf "↑"
+    elif (( $(echo "$price < $old" | bc -l) )); then
+        printf "↓"
+    else
+        printf "≡"
+    fi
+fi
+echo "$coin $price" >> ${last_file}
 
 printf "\n"

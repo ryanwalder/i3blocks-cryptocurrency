@@ -14,6 +14,10 @@ parser.add_argument('-c', '--coin',
 parser.add_argument('-f', '--fiat',
                     action='store',
                     default='USD')
+parser.add_argument('-m', '--movement',
+                    dest='movement',
+                    action='store_true')
+parser.set_defaults(movement=False)
 args = parser.parse_args()
 
 coin = args.coin.upper()
@@ -65,14 +69,17 @@ else:
     diff_price = '-{}{}'.format(lookup[fiat], diff_price)
     diff_direction = '%{F#f00}↓%{F-}'
 
-output = '{} {}{} {} {}%{} {} {}%{}'.format(lookup[coin],
-                                        lookup[fiat],
-                                        round(price, 2),
-                                        change,
-                                        change_pct,
-                                        change_direction,
-                                        diff_price,
-                                        diff_pct,
-                                        diff_direction)
+if args.movement:
+    output = '{} {}{} {} {}%{} {} {}%{}'.format(lookup[coin],
+                                                lookup[fiat],
+                                                round(price, 2),
+                                                change,
+                                                change_pct,
+                                                change_direction,
+                                                diff_price,
+                                                diff_pct,
+                                                diff_direction)
+else:
+    output = '{} {}{}'.format(lookup[coin], lookup[fiat], round(price, 2))
 
 print(output)

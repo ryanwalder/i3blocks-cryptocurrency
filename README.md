@@ -4,13 +4,19 @@ i3block to check crypto currency exchange rates for BTC, LTC, ETH in your curren
 
 ## Requirements
 
-`pip install moneywagon`
+`pip install requests`
 
 ## Usage
 
-`./ccurency fiat coin [coin2..coinN]`
+```
+usage: ccurrency [-h] [-c COIN] [-f FIAT] [-m] [-p]
 
-eg:
+Set Coin/Fiat pair
 
-`./ccurency usd btc ltc`
-
+optional arguments:
+  -h, --help            show this help message and exit
+  -c COIN, --coin COIN  Coin to check
+  -f FIAT, --fiat FIAT  Fiat to check
+  -m, --movement        Show price movement up/down
+  -p, --polybar         Add Polybar colouring to movement
+```

@@ -59,32 +59,18 @@ diff_pct   = round((diff_price/hist_price)*100, 2)
 # better, add coloured ↑↓s for market movement.
 if change > 0:
     change = '{}{}'.format(lookup[fiat], change)
-    if args.polybar:
-        change_direction = '%{F#00ff00}↑%{F-}'
-    else:
-        change_direction = '↑'
+    change_direction = '%{F#00ff00}↑%{F-}' if args.polybar else '↑'
 else:
     change = str(change)
     change = '-{}{}'.format(lookup[fiat], change[1:])
-    if args.polybar:
-        change_direction = '%{F#f00}↓%{F-}'
-    else:
-        change_direction = '↓'
-
+    change_direction = '%{F#f00}↓%{F-}' if args.polybar else '↓'
 if diff_price > 0:
     diff_price = '{}{}'.format(lookup[fiat], diff_price)
-    if args.polybar:
-        diff_direction = '%{F#00ff00}↑%{F-}'
-    else:
-        diff_direction = '↑'
+    diff_direction = '%{F#00ff00}↑%{F-}' if args.polybar else '↑'
 else:
     str(diff_price)
     diff_price = '-{}{}'.format(lookup[fiat], diff_price)
-    if args.polybar:
-        diff_direction = '%{F#f00}↓%{F-}'
-    else:
-        diff_direction = '↓'
-
+    diff_direction = '%{F#f00}↓%{F-}' if args.polybar else '↓'
 if args.movement:
     output = '{} {}{} {} {}%{} {} {}%{}'.format(lookup[coin],
                                                 lookup[fiat],
